@@ -4,6 +4,32 @@ const SLACK_WEBHOOK_URL = process.env.SLACK_WEBHOOK_CLIENTS;
 const NOTIFY_EMAIL = process.env.NOTIFY_EMAIL;
 const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD;
 
+const sliderLabels: Record<string, [string, string]> = {
+  compareWarmPro: ["温かみ・親しみ", "プロフェッショナル"],
+  compareSimpleRich: ["シンプル", "情報量多め"],
+  comparePopCalm: ["ポップ", "落ち着き"],
+  comparePhotoText: ["写真メイン", "文章メイン"],
+};
+
+function formatSlider(key: string, value: number): string {
+  const [left, right] = sliderLabels[key] || [key, key];
+  const labels = [`◀${left}`, "やや左", "中間", "やや右", `${right}▶`];
+  return `${labels[value - 1]} (${value}/5)`;
+}
+
+const siteNames: Record<string, [string, string]> = {
+  "warm-vs-luxury": ["ボンパピ(親しみ系)", "ケネルズ東京(高級系)"],
+  "handmade-vs-corporate": ["さくらっく(地域密着)", "ドッグライフP(実績重視)"],
+};
+
+function formatSitePref(id: string, value: string): string {
+  const [a, b] = siteNames[id] || ["A", "B"];
+  if (value === "A") return a;
+  if (value === "B") return b;
+  if (value === "both") return "両方の要素を取り入れたい";
+  return "未選択";
+}
+
 export async function POST(req: NextRequest) {
   try {
     const data = await req.json();
@@ -28,10 +54,16 @@ export async function POST(req: NextRequest) {
       `*理想の客層:* ${data.idealCustomers || "未記入"}`,
       `*よくある質問:* ${data.customerConcerns || "未記入"}`,
       "",
-      `*HP目的:* ${data.websitePurpose?.join("、") || "未選択"}${data.websitePurposeOther ? `（${data.websitePurposeOther}）` : ""}`,
-      `*希望ページ:* ${data.desiredPages?.join("、") || "未選択"}${data.desiredPagesOther ? `（${data.desiredPagesOther}）` : ""}`,
-      `*デザイン:* ${data.designPreference || "未記入"}`,
-      `*参考サイト:* ${data.referenceUrls || "未記入"}`,
+      "--- デザインの好み ---",
+      ...Object.entries(data.sitePreferences || {}).map(
+        ([id, v]) => `*サイト比較 ${id}:* ${formatSitePref(id, v as string)}`
+      ),
+      `*温かみ↔プロ:* ${formatSlider("compareWarmPro", data.compareWarmPro)}`,
+      `*シンプル↔情報量:* ${formatSlider("compareSimpleRich", data.compareSimpleRich)}`,
+      `*ポップ↔落ち着き:* ${formatSlider("comparePopCalm", data.comparePopCalm)}`,
+      `*写真↔文章:* ${formatSlider("comparePhotoText", data.comparePhotoText)}`,
+      "",
+      `*HP目的:* ${data.websitePurpose?.join("、") || "未選択"}`,
       `*既存SNS:* ${data.existingSns || "未記入"}`,
       "",
       `*写真:* ${data.hasPhotos || "未選択"}`,
@@ -64,9 +96,7 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      const plainText = lines
-        .map((l) => l.replace(/\*/g, ""))
-        .join("\n");
+      const plainText = lines.map((l) => l.replace(/\*/g, "")).join("\n");
 
       await transporter.sendMail({
         from: NOTIFY_EMAIL,
