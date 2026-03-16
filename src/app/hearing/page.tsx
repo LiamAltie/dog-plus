@@ -22,12 +22,7 @@ interface FormData {
   currentCustomers: string;
   idealCustomers: string;
   customerConcerns: string;
-  // 比較選択（1〜5のスライダー値、3が中間）
-  compareWarmPro: number;       // 温かみ ←→ プロフェッショナル
-  compareSimpleRich: number;    // シンプル ←→ 情報量多め
-  comparePopCalm: number;       // ポップ ←→ 落ち着き
-  comparePhotoText: number;     // 写真メイン ←→ 文章メイン
-  // サイト比較の好み
+  // サイト比較の好み（4軸）
   sitePreferences: Record<string, string>;
   websitePurpose: string[];
   existingSns: string;
@@ -53,10 +48,6 @@ const initialFormData: FormData = {
   currentCustomers: "",
   idealCustomers: "",
   customerConcerns: "",
-  compareWarmPro: 3,
-  compareSimpleRich: 3,
-  comparePopCalm: 3,
-  comparePhotoText: 3,
   sitePreferences: {},
   websitePurpose: [],
   existingSns: "",
@@ -84,34 +75,66 @@ const purposeOptions = [
   "その他",
 ];
 
-// ── サイト比較データ ──
+// ── サイト比較データ（4軸） ──
 const siteComparisons = [
   {
-    id: "warm-vs-luxury",
+    id: "warmth-competence",
     question: "どちらの雰囲気がイメージに近いですか？",
+    subtitle: "お店全体の印象として",
     siteA: {
-      name: "ボンパピ",
-      image: "/references/bonnepuppy.jpg",
-      description: "親しみやすい・ポップ・楽しい雰囲気",
+      name: "さくらっく",
+      image: "/references/sakuluck.jpg",
+      description: "温かみ・親しみやすい・アットホーム",
     },
     siteB: {
       name: "THE ケネルズ東京",
       image: "/references/kennels-tokyo.jpg",
-      description: "高級感・落ち着き・ホテルのような雰囲気",
+      description: "プロフェッショナル・高級感・信頼",
     },
   },
   {
-    id: "handmade-vs-corporate",
-    question: "お店の規模感として近いのは？",
+    id: "arousal",
+    question: "どちらのテンション感が近いですか？",
+    subtitle: "サイトを見たときの印象として",
     siteA: {
-      name: "さくらっく",
-      image: "/references/sakuluck.jpg",
-      description: "地域密着・アットホーム・手作り感",
+      name: "イヌのトリコ",
+      image: "/references/inu-no-trico.jpg",
+      description: "にぎやか・元気・活発な印象",
     },
     siteB: {
-      name: "ドッグライフプランナーズ",
-      image: "/references/dog-lp.jpg",
-      description: "多店舗展開・実績重視・信頼感",
+      name: "LOVE WOOF!!",
+      image: "/references/lovewoof.jpg",
+      description: "静か・穏やか・落ち着いた印象",
+    },
+  },
+  {
+    id: "complexity",
+    question: "どちらの情報量が好みですか？",
+    subtitle: "ページの見た目として",
+    siteA: {
+      name: "Paw Park",
+      image: "/references/pawpark.jpg",
+      description: "シンプル・すっきり・余白が多い",
+    },
+    siteB: {
+      name: "ほめほめホーム",
+      image: "/references/homehomehome.jpg",
+      description: "情報たっぷり・にぎやか・充実",
+    },
+  },
+  {
+    id: "typicality",
+    question: "どちらのスタイルが好みですか？",
+    subtitle: "サイトの個性として",
+    siteA: {
+      name: "Parco del Cane",
+      image: "/references/tripletta.jpg",
+      description: "犬の保育園らしい・王道・安心感",
+    },
+    siteB: {
+      name: "Pee-Ka-Boo",
+      image: "/references/pee-ka-boo.jpg",
+      description: "個性的・おしゃれ・他にない感じ",
     },
   },
 ];
@@ -181,28 +204,6 @@ function CheckboxGroup({ options, selected, onChange }: {
   );
 }
 
-// ── スライダーコンポーネント ──
-function CompareSlider({ labelLeft, labelRight, value, onChange }: {
-  labelLeft: string; labelRight: string; value: number; onChange: (v: number) => void;
-}) {
-  return (
-    <div className="space-y-2">
-      <div className="flex justify-between text-xs text-gray-500">
-        <span className={value <= 2 ? "font-bold text-primary-dark" : ""}>{labelLeft}</span>
-        <span className={value >= 4 ? "font-bold text-primary-dark" : ""}>{labelRight}</span>
-      </div>
-      <input
-        type="range" min={1} max={5} step={1} value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
-      />
-      <div className="flex justify-between text-[10px] text-gray-300 px-1">
-        {["←寄り", "", "どちらでも", "", "寄り→"].map((t, i) => <span key={i}>{t}</span>)}
-      </div>
-    </div>
-  );
-}
-
 // ── サイト比較コンポーネント ──
 function SiteComparison({ comparison, selected, onSelect }: {
   comparison: typeof siteComparisons[0];
@@ -212,6 +213,7 @@ function SiteComparison({ comparison, selected, onSelect }: {
   return (
     <div className="space-y-3">
       <p className="text-sm font-medium">{comparison.question}</p>
+      {comparison.subtitle && <p className="text-xs text-gray-400 -mt-2">{comparison.subtitle}</p>}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {[comparison.siteA, comparison.siteB].map((site, i) => {
           const value = i === 0 ? "A" : "B";
@@ -412,9 +414,9 @@ export default function HearingPage() {
           {/* ── セクション5: デザインの好み（比較選択） ── */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <SectionTitle number={5} title="ホームページの雰囲気"
-              subtitle="同業のサイトを2つお見せします。直感でお選びください" />
+              subtitle="同業のサイトを2つお見せします。直感で「こっちが近い」を選んでください" />
 
-            <div className="space-y-8">
+            <div className="space-y-10">
               {siteComparisons.map((comp) => (
                 <SiteComparison
                   key={comp.id}
@@ -423,22 +425,6 @@ export default function HearingPage() {
                   onSelect={(v) => updateSitePref(comp.id, v)}
                 />
               ))}
-            </div>
-
-            <div className="mt-8 pt-6 border-t border-gray-100">
-              <p className="text-sm font-medium mb-4">
-                もう少し細かく教えてください（スライダーを動かすだけでOK）
-              </p>
-              <div className="space-y-6">
-                <CompareSlider labelLeft="温かみ・親しみやすい" labelRight="プロフェッショナル・高級感"
-                  value={form.compareWarmPro} onChange={(v) => update("compareWarmPro", v)} />
-                <CompareSlider labelLeft="シンプル・すっきり" labelRight="情報量多め・にぎやか"
-                  value={form.compareSimpleRich} onChange={(v) => update("compareSimpleRich", v)} />
-                <CompareSlider labelLeft="ポップ・カラフル" labelRight="落ち着き・ナチュラル"
-                  value={form.comparePopCalm} onChange={(v) => update("comparePopCalm", v)} />
-                <CompareSlider labelLeft="写真をたくさん見せたい" labelRight="説明文をしっかり載せたい"
-                  value={form.comparePhotoText} onChange={(v) => update("comparePhotoText", v)} />
-              </div>
             </div>
           </div>
 
