@@ -15,7 +15,6 @@ function formatSitePref(id: string, value: string): string {
   const [a, b] = siteNames[id] || ["A", "B"];
   if (value === "A") return a;
   if (value === "B") return b;
-  if (value === "both") return "両方の要素を取り入れたい";
   return "未選択";
 }
 

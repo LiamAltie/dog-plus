@@ -85,13 +85,11 @@ const siteComparisons = [
       name: "さくらっく",
       image: "/references/sakuluck.jpg",
       url: "https://www.sakuluck.jp/",
-      description: "温かみ・親しみやすい・アットホーム",
     },
     siteB: {
       name: "THE ケネルズ東京",
       image: "/references/kennels-tokyo.jpg",
       url: "https://the-kennels.tokyo/",
-      description: "プロフェッショナル・高級感・信頼",
     },
   },
   {
@@ -102,13 +100,11 @@ const siteComparisons = [
       name: "イヌのトリコ",
       image: "/references/inu-no-trico.jpg",
       url: "https://www.inu-no-trico.com/",
-      description: "にぎやか・元気・活発な印象",
     },
     siteB: {
       name: "LOVE WOOF!!",
       image: "/references/lovewoof.jpg",
       url: "https://lovewoof.co.jp/",
-      description: "静か・穏やか・落ち着いた印象",
     },
   },
   {
@@ -119,13 +115,11 @@ const siteComparisons = [
       name: "Paw Park",
       image: "/references/pawpark.jpg",
       url: "https://pawpark.jp/",
-      description: "シンプル・すっきり・余白が多い",
     },
     siteB: {
       name: "ほめほめホーム",
       image: "/references/homehomehome.jpg",
       url: "https://homehomehome.jp.net/",
-      description: "情報たっぷり・にぎやか・充実",
     },
   },
   {
@@ -136,13 +130,11 @@ const siteComparisons = [
       name: "Parco del Cane",
       image: "/references/tripletta.jpg",
       url: "https://tripletta.com/",
-      description: "犬の保育園らしい・王道・安心感",
     },
     siteB: {
       name: "Pee-Ka-Boo",
       image: "/references/pee-ka-boo.jpg",
       url: "https://www.pee-ka-boo.net/",
-      description: "個性的・おしゃれ・他にない感じ",
     },
   },
 ];
@@ -241,11 +233,8 @@ function SiteComparison({ comparison, selected, onSelect }: {
                 )}
               </div>
               <div className="p-3">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <p className="text-sm font-bold">{site.name}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">{site.description}</p>
-                  </div>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-sm font-bold">{site.name}</p>
                   <a
                     href={site.url}
                     target="_blank"
@@ -264,12 +253,6 @@ function SiteComparison({ comparison, selected, onSelect }: {
           );
         })}
       </div>
-      <button type="button"
-        onClick={() => onSelect("both")}
-        className={`w-full text-xs py-2 rounded-lg border transition ${selected === "both" ? "border-primary bg-primary/5 text-primary-dark font-bold" : "border-gray-200 text-gray-400 hover:border-primary/40"}`}
-      >
-        どちらの要素も取り入れたい
-      </button>
     </div>
   );
 }
