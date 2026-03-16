@@ -84,11 +84,13 @@ const siteComparisons = [
     siteA: {
       name: "さくらっく",
       image: "/references/sakuluck.jpg",
+      url: "https://www.sakuluck.jp/",
       description: "温かみ・親しみやすい・アットホーム",
     },
     siteB: {
       name: "THE ケネルズ東京",
       image: "/references/kennels-tokyo.jpg",
+      url: "https://the-kennels.tokyo/",
       description: "プロフェッショナル・高級感・信頼",
     },
   },
@@ -99,11 +101,13 @@ const siteComparisons = [
     siteA: {
       name: "イヌのトリコ",
       image: "/references/inu-no-trico.jpg",
+      url: "https://www.inu-no-trico.com/",
       description: "にぎやか・元気・活発な印象",
     },
     siteB: {
       name: "LOVE WOOF!!",
       image: "/references/lovewoof.jpg",
+      url: "https://lovewoof.co.jp/",
       description: "静か・穏やか・落ち着いた印象",
     },
   },
@@ -114,11 +118,13 @@ const siteComparisons = [
     siteA: {
       name: "Paw Park",
       image: "/references/pawpark.jpg",
+      url: "https://pawpark.jp/",
       description: "シンプル・すっきり・余白が多い",
     },
     siteB: {
       name: "ほめほめホーム",
       image: "/references/homehomehome.jpg",
+      url: "https://homehomehome.jp.net/",
       description: "情報たっぷり・にぎやか・充実",
     },
   },
@@ -129,11 +135,13 @@ const siteComparisons = [
     siteA: {
       name: "Parco del Cane",
       image: "/references/tripletta.jpg",
+      url: "https://tripletta.com/",
       description: "犬の保育園らしい・王道・安心感",
     },
     siteB: {
       name: "Pee-Ka-Boo",
       image: "/references/pee-ka-boo.jpg",
+      url: "https://www.pee-ka-boo.net/",
       description: "個性的・おしゃれ・他にない感じ",
     },
   },
@@ -233,8 +241,24 @@ function SiteComparison({ comparison, selected, onSelect }: {
                 )}
               </div>
               <div className="p-3">
-                <p className="text-sm font-bold">{site.name}</p>
-                <p className="text-xs text-gray-500 mt-0.5">{site.description}</p>
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold">{site.name}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{site.description}</p>
+                  </div>
+                  <a
+                    href={site.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="shrink-0 flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium text-primary border border-primary/30 rounded-lg hover:bg-primary/5 transition"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                    サイトを見る
+                  </a>
+                </div>
               </div>
             </button>
           );
